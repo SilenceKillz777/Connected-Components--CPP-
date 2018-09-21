@@ -33,6 +33,11 @@ class connectedComponents{
 		for(int i=0;i<4;i++){
 			neighborAry[i] = 0;
 		}
+		int EQSize = (numRows*numCols)/2;
+		EQAry = new int[EQSize];
+		for(int i=0;i<EQSize;i++){
+			EQAry[i] = i;
+		}
 	}
 	
 	//destructor
@@ -257,7 +262,6 @@ int main(int argc, char* argv[]){
 		//cout<<"This "<<newLabel<<endl;
 		component.ConnectCC_Pass1(zeroFramedAry);
 		//component.loadNeighbors(zeroFramedAry,neighborAry,newLabel,1);
-		
 		//cout<<"That "<<newLabel<<endl;
 	}
 	
