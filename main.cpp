@@ -11,7 +11,7 @@ struct Property{
 class connectedComponents{
 	public:
 	
-	int numRows, numCols, minVal, maxVal, newMin, newMax, newLabel = 0;
+	int numRows, numCols, minVal, maxVal, newMin, newMax, newLabel = 0, EQSize;
 	int **zeroFramedAry;
 	int *EQAry;
 	int neighborAry[4];	
@@ -33,20 +33,12 @@ class connectedComponents{
 		for(int i=0;i<4;i++){
 			neighborAry[i] = 0;
 		}
-		int EQSize = (numRows*numCols)/2;
+		EQSize = (numRows*numCols)/2;
 		EQAry = new int[EQSize];
 		for(int i=0;i<EQSize;i++){
 			EQAry[i] = i;
 		}
-	}
-	
-	//destructor
-	~connectedComponents(){
-		for(int i=0;i<numRows+2;i++){
-			delete [] zeroFramedAry[i];
-		}
-		delete [] neighborAry;
-		delete [] EQAry;
+		
 	}
 	
 	//methods
@@ -59,13 +51,6 @@ class connectedComponents{
 				zeroFramedAry[i][0] = 0;
 				zeroFramedAry[i][numCols+1] = 0;
 			}
-		}
-		
-		for(int i=0;i<numRows+2;i++){
-			for(int j=0;j<numCols+2;j++){
-				cout<<zeroFramedAry[i][j]<<" ";
-			}
-			cout<<endl;
 		}
 	}
 	
@@ -80,15 +65,6 @@ class connectedComponents{
 				in>>zeroFramedAry[i+1][j+1];
 			}
 		}
-		/*
-		for(int i=0;i<numRows+2;i++){
-			for(int j=0;j<numCols+2;j++){
-				cout<<zeroFramedAry[i][j];
-			}
-			cout<<endl;
-		}
-		in.close();
-		*/
 	}
 	
 	void loadNeighbors(int** zeroFramedAry, int neighborAry[], int r, int c){
@@ -97,82 +73,31 @@ class connectedComponents{
 			neighborAry[i] = 0;
 		}
 		
-		if(zeroFramedAry[r-1][c]!=0){
-			//cout<<" hit this please?"<<endl;
-			for(int i=0;i<4;i++){
-				if(neighborAry[i] == 0){
-					neighborAry[i] = zeroFramedAry[r-1][c];
-					//cout<<"Array: "<<zeroFramedAry[r-1][c];
-				}
-				//cout<<i<<" hit this "<<endl;
-				break;
-			}
-		}
-		if(zeroFramedAry[r][c-1]!=0){
-			for(int i=0;i<4;i++){
-				if(neighborAry[i] == 0){
-					neighborAry[i] = zeroFramedAry[r][c-1];	
-				}
-				//cout<<i<<" hit here? "<<endl;
-				break;
-			}
-		}
-		/*
-		for(int i=0;i<4;i++)
-			 cout<<neighborAry[i]<<" ";
-		cout<<endl;
-		/*
-		int currNum=0;
-		switch(pass){
-			case 1:
-				for(int i=1;i<numRows+1;i++){
-					for(int j=1;j<numCols+1;j++){
-						neighborAry[0] = zeroFramedAry[i-1][j];
-						neighborAry[1] = zeroFramedAry[i][j-1];
-						
-						if(neighborAry[0]==0 && neighborAry[1]==0){
-							ConnectCC_Pass1(1, newLabel, zeroFramedAry, i, j);
-						}
-						
-						for(int m=0;m<2;m++){
-							if(neighborAry[m]!=0)
-								currNum = neighborAry[m];
-						}		
-						for(int n=0;n<2;n++){
-							if(neighborAry[n]!=0){
-						
-								if(neighborAry[n]!=currNum)
-									ConnectCC_Pass1(3, newLabel, zeroFramedAry, i, j);
-										
-								else ConnectCC_Pass1(2, newLabel, zeroFramedAry, i, j);
-							}
-						}
-						
-						else if(neighborAry[0]!=neighborAry[1]){
-							if(neighborAry[0]!=0)
-								currNum = neighborAry[0];
-							if(neighborAry[1]!=0)
-								currNum = neighborAry[1];
-							if(neighborAry[0]==0||neighborAry[1]==0)
-								ConnectCC_Pass1(2, newLable, zeroFramedAry[i][j]);
-						}
-						
-						//else ConnectCC_Pass1(3, newLable, zeroFramedAry[i][j]);
-						
-						
-					
-					}
-				}
-				cout<<"This is pass 1..."<<endl;
-				break;
-			
-			case 2:
-				cout<<"This is pass 2..."<<endl;
-				break;
-		}
-		*/
+		neighborAry[0] = zeroFramedAry[r-1][c];
+		neighborAry[1] = zeroFramedAry[r][c-1];
+		neighborAry[2] = zeroFramedAry[r][c+1];
+		neighborAry[3] = zeroFramedAry[r+1][c];
+		
 	}
 	
+	void updateEQAry(int*& EQAry, int a, int b, int minLabel){
+		if(a>minLabel)EQAry[a] = minLabel;
+		if(b>minLabel)EQAry[b] = minLabel;
+		
+	}
+	
+	void manageEQAry(){
+		int trueLabel = 0, index = 1;
+		while(!index>newLabel){
+			if(EQAry[index] == index){
+				trueLabel++;
+				EQAry[index] = trueLabel;
+			}		
+			else EQAry[index] = EQAry[EQAry[index]];
+			index++;
+		}
+	}
+
 	void ConnectCC_Pass1(int** zeroFramedAry){
 		
 		for(int i=1;i<numRows+1;i++){
@@ -184,40 +109,96 @@ class connectedComponents{
 					//Case 1
 					if(neighborAry[0]==0 && neighborAry[1]==0){
 						newLabel++;
-						cout<<"newLabel: "<<newLabel<<endl;
 						zeroFramedAry[i][j] = newLabel;
-					}
-				
-					//Case 2
-					else if(neighborAry[0]==0 && neighborAry[1]!=0){
-						zeroFramedAry[i][j] = neighborAry[1];
-					}
-					else if(neighborAry[0]!=0 && neighborAry[1]==0){
-						zeroFramedAry[i][j] = neighborAry[0];
-					}
-					else if(neighborAry[0]==neighborAry[1]){
-						zeroFramedAry[i][j] = neighborAry[0];
 					}
 					
 					//Case 3
-					else if(neighborAry[0]!=neighborAry[1]){
+					else if(neighborAry[0]!=0 && neighborAry[1]!=0 && neighborAry[0]!=neighborAry[1]){
 						int minLabel = 0;
 						minLabel = neighborAry[0];
-						if (neighborAry[1]<neighborAry[0])
+						if(neighborAry[1]<neighborAry[0]) 
 							minLabel = neighborAry[1];
 						zeroFramedAry[i][j] = minLabel;
+						updateEQAry(EQAry,neighborAry[0],neighborAry[1],minLabel);
+					}
+					
+					//Case 2
+					else{
+						if(neighborAry[0]!=0)
+							zeroFramedAry[i][j] = neighborAry[0];
+						else zeroFramedAry[i][j] = neighborAry[1];
 					}
 				}
 			}
 		}
+	}
+	
+	void ConnectCC_Pass2(int** zeroFramedAry){
 		
-		cout<<"No Top or Left Neighbors: "<<newLabel<<endl;
+		for(int i=numRows+1;i>0;i--){
+			for(int j=numCols+1;j>0;j--){
+				if(zeroFramedAry[i][j]>0){
+					
+					loadNeighbors(zeroFramedAry,neighborAry,i,j);
+					
+					//Case 1
+					if(neighborAry[2]==0 && neighborAry[3]==0);
+					
+					//Case 2
+					else{
+						int minLabel = 0;
+						minLabel = zeroFramedAry[i][j];
+						if(neighborAry[2]<minLabel && neighborAry[2]!=0)
+							minLabel = neighborAry[2];
+						if(neighborAry[3]<minLabel && neighborAry[3]!=0)
+							minLabel = neighborAry[3];
+						zeroFramedAry[i][j] = minLabel;
+						if(neighborAry[2]!=0 && neighborAry[3]!=0 && neighborAry[2]!=neighborAry[3]);
+						updateEQAry(EQAry,neighborAry[2],neighborAry[3],minLabel);
+					}
+				}
+			}
+		}
+	}
+	
+	void ConnectCC_Pass3(int** zeroFramedAry){
 		
+	}
+	
+	void prettyPrint(int** zeroFramedAry, ofstream& file, int pass){
+		file<<"This is the result of pass #"<<pass<<":"<<endl;
 		for(int i=0;i<numRows+2;i++){
 			for(int j=0;j<numCols+2;j++){
-				cout<<zeroFramedAry[i][j]<<" ";
+				if(zeroFramedAry[i][j]<10)
+					file<<zeroFramedAry[i][j]<<"  ";
+				else file<<zeroFramedAry[i][j]<<" ";
 			}
-			cout<<endl;
+			file<<endl;
+		}
+		file<<endl<<endl<<"This is the EQArray: "<<endl;
+		
+		int counter=10;
+		int tempEQSize=EQSize;
+		while(tempEQSize/10!=0){
+			counter=counter*10;
+			tempEQSize=tempEQSize/10;
+		}
+		
+		for(int i=0;i<EQSize;i++){
+			int temp=EQAry[i];
+
+			if(i%25==0){
+				file<<EQAry[i];
+				file<<endl;
+			}
+			else{
+				file<<EQAry[i];
+				while(temp<counter){
+					file<<" ";
+					temp=temp*10;	
+				}
+				file<<" ";
+			}
 		}
 	}
 };
@@ -225,14 +206,13 @@ class connectedComponents{
 int main(int argc, char* argv[]){
 	ifstream input (argv[1]);
 	string fileName = argv[1];
-	//ofstream outFile1 (argv[2]);
-	//ofstream outFile2 (argv[3]);
-	//ofstream outFile3 (argv[4]);
+	ofstream outFile1 (argv[2]);
+	ofstream outFile2 (argv[3]);
+	ofstream outFile3 (argv[4]);
 	int numRows, numCols, minVal, maxVal, newMin, newMax;
 	int newLabel = 0;
 	int** zeroFramedAry;
 	int neighborAry[4];
-	int* EQAry;
 	
 	if(input.is_open()){
 		input>>numRows>>numCols>>minVal>>maxVal;
@@ -248,21 +228,17 @@ int main(int argc, char* argv[]){
 		for(int i=0;i<4;i++){
 			neighborAry[i] = 0;
 		}
-		/*
-		//initializing array
-		for(int i=0;i<numRows+2;i++){
-			for(int j=0;j<numCols+2;j++){
-				zeroFramedAry[i][j] = 0;
-			}
-		}
-		*/
+		
 		connectedComponents component(numRows, numCols, minVal, maxVal);
 		component.loadImage(zeroFramedAry,fileName);
 		component.zeroFrame(zeroFramedAry);
-		//cout<<"This "<<newLabel<<endl;
 		component.ConnectCC_Pass1(zeroFramedAry);
-		//component.loadNeighbors(zeroFramedAry,neighborAry,newLabel,1);
-		//cout<<"That "<<newLabel<<endl;
+		component.prettyPrint(zeroFramedAry, outFile1, 1);
+		component.ConnectCC_Pass2(zeroFramedAry);
+		component.prettyPrint(zeroFramedAry, outFile2, 2);
+		component.manageEQAry();
+		component.ConnectCC_Pass3(zeroFramedAry);
+		component.prettyPrint(zeroFramedAry, outFile3, 3);
 	}
 	
 	else cout<<"Couldn't retrieve data.";
