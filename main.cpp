@@ -88,7 +88,7 @@ class connectedComponents{
 	
 	void manageEQAry(){
 		int trueLabel = 0, index = 1;
-		while(!index>newLabel){
+		while(!(index>newLabel)){
 			if(EQAry[index] == index){
 				trueLabel++;
 				EQAry[index] = trueLabel;
@@ -162,7 +162,18 @@ class connectedComponents{
 	}
 	
 	void ConnectCC_Pass3(int** zeroFramedAry){
+		int numObjects = 0;
+		for(int i=1;i<numRows+1;i++){
+			for(int j=1;j<numCols+1;j++){
+				zeroFramedAry[i][j] = EQAry[zeroFramedAry[i][j]];
+			}
+		}
 		
+		for(int i=1;i<numRows+1;i++){
+			for(int j=1;j<numCols+1;j++){
+				
+			}
+		}
 	}
 	
 	void prettyPrint(int** zeroFramedAry, ofstream& file, int pass){
