@@ -5,7 +5,9 @@
 using namespace std;
 
 struct Property{
-	
+	int label;
+	int numPixels;
+	int minRow, minCol, maxRow, maxCol;
 };
 
 class connectedComponents{
@@ -161,32 +163,29 @@ class connectedComponents{
 		}
 	}
 	
-	void ConnectCC_Pass3(int** zeroFramedAry){
-		int numObjects = 0;
+	int ConnectCC_Pass3(int** zeroFramedAry){
+		int numObjects = 0, newMin = 0, newMax = 0;
 		for(int i=1;i<numRows+1;i++){
 			for(int j=1;j<numCols+1;j++){
 				zeroFramedAry[i][j] = EQAry[zeroFramedAry[i][j]];
+				if(zeroFramedAry[i][j]>numObjects)
+					numObjects = zeroFramedAry[i][j];
+				if(zeroFramedAry[i][j]>newMax)
+					newMax = zeroFramedAry[i][j];
 			}
 		}
 		
 		for(int i=1;i<numRows+1;i++){
 			for(int j=1;j<numCols+1;j++){
-				
+				if(zeroFramedAry[i][j]){
+				}
 			}
 		}
+		return numObjects;
 	}
 	
-	void prettyPrint(int** zeroFramedAry, ofstream& file, int pass){
-		file<<"This is the result of pass #"<<pass<<":"<<endl;
-		for(int i=0;i<numRows+2;i++){
-			for(int j=0;j<numCols+2;j++){
-				if(zeroFramedAry[i][j]<10)
-					file<<zeroFramedAry[i][j]<<"  ";
-				else file<<zeroFramedAry[i][j]<<" ";
-			}
-			file<<endl;
-		}
-		file<<endl<<endl<<"This is the EQArray: "<<endl;
+	void printEQAry(ofstream& file, int pass){
+		file<<"This is the EQArray for pass #"<<pass<<":"<<endl;
 		
 		int counter=10;
 		int tempEQSize=EQSize;
@@ -212,6 +211,131 @@ class connectedComponents{
 			}
 		}
 	}
+	
+	void printEQAry(ofstream& file, string pass){
+		file<<"This is the EQArray after manageEQAry method: "<<endl;
+		
+		int counter=10;
+		int tempEQSize=EQSize;
+		while(tempEQSize/10!=0){
+			counter=counter*10;
+			tempEQSize=tempEQSize/10;
+		}
+		
+		for(int i=0;i<EQSize;i++){
+			int temp=EQAry[i];
+
+			if(i%25==0){
+				file<<EQAry[i];
+				file<<endl;
+			}
+			else{
+				file<<EQAry[i];
+				while(temp<counter){
+					file<<" ";
+					temp=temp*10;	
+				}
+				file<<" ";
+			}
+		}
+		file<<endl;
+	}
+	
+	void prettyPrint(int** zeroFramedAry, ofstream& file, int pass){
+		file<<"This is the result of pass #"<<pass<<":"<<endl;
+		for(int i=0;i<numRows+2;i++){
+			for(int j=0;j<numCols+2;j++){
+				if(zeroFramedAry[i][j]<10 && zeroFramedAry[i][j]!=0)
+					file<<zeroFramedAry[i][j]<<"  ";
+				else if(zeroFramedAry[i][j]<10 && zeroFramedAry[i][j]==0)
+					file<<"   ";
+				else file<<zeroFramedAry[i][j]<<" ";
+			}
+			file<<endl;
+		}
+		printEQAry(file, pass);
+		file<<endl;
+	}
+	
+	void printImage(int** zeroFramedAry, ofstream& file){
+		file<<numRows<<" "<<numCols<<" "<<minVal<<" "<<maxVal<<endl;
+		for(int i=0;i<numRows+2;i++){
+			for(int j=0;j<numCols+2;j++){
+				if(zeroFramedAry[i][j]<10)
+					file<<zeroFramedAry[i][j]<<"  ";
+				else file<<zeroFramedAry[i][j]<<" ";
+			}
+			file<<endl;
+		}
+	}
+	
+	int countLabel(int label, int** zeroFramedAry){
+		int count = 0;
+		for(int i=1;i<numRows+1;i++){
+			for(int j=1;j<numCols+1;j++){
+				if(zeroFramedAry[i][j]==label)
+					count++;
+			}
+		}
+		return count;
+	}
+	
+	void findBoundingBox(int& minRow, int& minCol, int& maxRow, int& maxCol, int label, int** zeroFramedAry){
+		int count = 0;
+		
+		for(int row=1;row<numRows+1;row++){
+			for(int col=1;col<numCols+1;col++){
+				if(zeroFramedAry[row][col] == label){
+					minCol = col;
+					maxCol = col;
+				}
+			}	
+		}
+		
+		for(int row=1;row<numRows+1;row++){
+			for(int col=1;col<numCols+1;col++){
+				if(count == 0 && zeroFramedAry[row][col] == label){
+					minRow = row;
+					maxRow = row;	
+					count++;
+				}
+				if(zeroFramedAry[row][col] == label)
+					maxRow = row;
+				
+				if(zeroFramedAry[row][col] == label && col<minCol)
+					minCol = col;
+				if(zeroFramedAry[row][col] == label && col>maxCol)
+					maxCol = col;
+			}
+		}
+		//cout<<minCol<<" "<<maxCol<<endl;
+	}
+	
+	void loadStruct(Property CC[], int** zeroFramedAry, int size){
+		int numPixels = 0;
+		for(int i=0;i<size;i++){
+			int minRow = 0, minCol = 0, maxRow = 0, maxCol = 0;
+			CC[i].label = i+1;
+			numPixels = countLabel(i+1,zeroFramedAry);
+			CC[i].numPixels = numPixels;
+			findBoundingBox(minRow, minCol, maxRow, maxCol, i+1, zeroFramedAry);
+			CC[i].minRow = minRow;
+			CC[i].minCol = minCol;
+			CC[i].maxRow = maxRow;
+			CC[i].maxCol = maxCol;
+		}
+	}
+	
+	void printStruct(Property CC[], int size, ofstream& file){
+		file<<numRows<<" "<<numCols<<" "<<minVal<<" "<<maxVal<<endl;
+		file<<size<<endl;
+		for(int i=0;i<size;i++){
+			file<<CC[i].label<<endl;
+			file<<CC[i].numPixels<<endl;
+			file<<CC[i].minRow<<" "<<CC[i].minCol<<endl;
+			file<<CC[i].maxRow<<" "<<CC[i].maxCol<<endl<<endl;
+		}
+	}
 };
 
 int main(int argc, char* argv[]){
@@ -224,6 +348,7 @@ int main(int argc, char* argv[]){
 	int newLabel = 0;
 	int** zeroFramedAry;
 	int neighborAry[4];
+	int var = 0;
 	
 	if(input.is_open()){
 		input>>numRows>>numCols>>minVal>>maxVal;
@@ -246,10 +371,15 @@ int main(int argc, char* argv[]){
 		component.ConnectCC_Pass1(zeroFramedAry);
 		component.prettyPrint(zeroFramedAry, outFile1, 1);
 		component.ConnectCC_Pass2(zeroFramedAry);
-		component.prettyPrint(zeroFramedAry, outFile2, 2);
+		component.prettyPrint(zeroFramedAry, outFile1, 2);
 		component.manageEQAry();
-		component.ConnectCC_Pass3(zeroFramedAry);
-		component.prettyPrint(zeroFramedAry, outFile3, 3);
+		var = component.ConnectCC_Pass3(zeroFramedAry);
+		Property CC[var];
+		component.loadStruct(CC, zeroFramedAry, var);
+		component.printStruct(CC, var, outFile3);
+		component.printEQAry(outFile1, "manageEQAry");
+		component.prettyPrint(zeroFramedAry, outFile1, 3);
+		component.printImage(zeroFramedAry, outFile2);
 	}
 	
 	else cout<<"Couldn't retrieve data.";
