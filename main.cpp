@@ -184,6 +184,7 @@ class connectedComponents{
 		return numObjects;
 	}
 	
+	//print EQAry method
 	void printEQAry(ofstream& file, int pass){
 		file<<"This is the EQArray for pass #"<<pass<<":"<<endl;
 		
@@ -212,6 +213,7 @@ class connectedComponents{
 		}
 	}
 	
+	//overloaded print EQAry method specifically for after manageEQAry method
 	void printEQAry(ofstream& file, string pass){
 		file<<"This is the EQArray after manageEQAry method: "<<endl;
 		
@@ -241,6 +243,7 @@ class connectedComponents{
 		file<<endl;
 	}
 	
+	//pretty print image and EQAry for each pass
 	void prettyPrint(int** zeroFramedAry, ofstream& file, int pass){
 		file<<"This is the result of pass #"<<pass<<":"<<endl;
 		for(int i=0;i<numRows+2;i++){
@@ -257,6 +260,7 @@ class connectedComponents{
 		file<<endl;
 	}
 	
+	//print image on argv[3]
 	void printImage(int** zeroFramedAry, ofstream& file){
 		file<<numRows<<" "<<numCols<<" "<<minVal<<" "<<maxVal<<endl;
 		for(int i=0;i<numRows+2;i++){
@@ -269,6 +273,7 @@ class connectedComponents{
 		}
 	}
 	
+	//counts number of pixels with same label
 	int countLabel(int label, int** zeroFramedAry){
 		int count = 0;
 		for(int i=1;i<numRows+1;i++){
@@ -280,9 +285,10 @@ class connectedComponents{
 		return count;
 	}
 	
+	//find top-left and bottom-right coordinates of bounding box
 	void findBoundingBox(int& minRow, int& minCol, int& maxRow, int& maxCol, int label, int** zeroFramedAry){
 		int count = 0;
-		
+		//finds first instance of label to initialize
 		for(int row=1;row<numRows+1;row++){
 			for(int col=1;col<numCols+1;col++){
 				if(zeroFramedAry[row][col] == label){
@@ -291,7 +297,7 @@ class connectedComponents{
 				}
 			}	
 		}
-		
+		//using first instance to update bounds
 		for(int row=1;row<numRows+1;row++){
 			for(int col=1;col<numCols+1;col++){
 				if(count == 0 && zeroFramedAry[row][col] == label){
@@ -308,9 +314,9 @@ class connectedComponents{
 					maxCol = col;
 			}
 		}
-		//cout<<minCol<<" "<<maxCol<<endl;
 	}
 	
+	//populating struct by label number
 	void loadStruct(Property CC[], int** zeroFramedAry, int size){
 		int numPixels = 0;
 		for(int i=0;i<size;i++){
@@ -326,6 +332,7 @@ class connectedComponents{
 		}
 	}
 	
+	//printing Struct into argv[4]
 	void printStruct(Property CC[], int size, ofstream& file){
 		file<<numRows<<" "<<numCols<<" "<<minVal<<" "<<maxVal<<endl;
 		file<<size<<endl;
@@ -355,7 +362,7 @@ int main(int argc, char* argv[]){
 		newMin = maxVal;
 		newMax = minVal;
 		
-		//setting up array
+		//setting up arrays
 		zeroFramedAry = new int*[numRows+2];
 		for(int i = 0;i < numRows+2; i++){
 			zeroFramedAry[i] = new int[numCols+2];
@@ -365,6 +372,7 @@ int main(int argc, char* argv[]){
 			neighborAry[i] = 0;
 		}
 		
+		//function calls
 		connectedComponents component(numRows, numCols, minVal, maxVal);
 		component.loadImage(zeroFramedAry,fileName);
 		component.zeroFrame(zeroFramedAry);
