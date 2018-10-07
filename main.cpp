@@ -174,7 +174,7 @@ class connectedComponents{
 					newMax = zeroFramedAry[i][j];
 			}
 		}
-		
+
 		for(int i=1;i<numRows+1;i++){
 			for(int j=1;j<numCols+1;j++){
 				if(zeroFramedAry[i][j]){
@@ -189,42 +189,7 @@ class connectedComponents{
 		file<<"This is the EQArray for pass #"<<pass<<":"<<endl;
 		
 		int counter=10;
-		int tempEQSize=EQSize;
-		while(tempEQSize/10!=0){
-			counter=counter*10;
-			tempEQSize=tempEQSize/10;
-		}
-		
-		for(int i=0;i<EQSize;i++){
-			int temp=EQAry[i];
-
-			if(i%25==0){
-				file<<EQAry[i];
-				file<<endl;
-			}
-			else{
-				file<<EQAry[i];
-				while(temp<counter){
-					file<<" ";
-					temp=temp*10;	
-				}
-				file<<" ";
-			}
-		}
-	}
-	
-	//overloaded print EQAry method specifically for after manageEQAry method
-	void printEQAry(ofstream& file, string pass){
-		file<<"This is the EQArray after manageEQAry method: "<<endl;
-		
-		int counter=10;
-		int tempEQSize=EQSize;
-		while(tempEQSize/10!=0){
-			counter=counter*10;
-			tempEQSize=tempEQSize/10;
-		}
-		
-		for(int i=0;i<EQSize;i++){
+		for(int i=0;i<newLabel;i++){
 			int temp=EQAry[i];
 
 			if(i%25==0){
@@ -241,6 +206,30 @@ class connectedComponents{
 			}
 		}
 		file<<endl;
+	}
+	
+	//overloaded print EQAry method specifically for after manageEQAry method
+	void printEQAry(ofstream& file, string pass){
+		file<<"This is the EQArray after manageEQAry method: "<<endl;
+		
+		int counter=10;
+		for(int i=0;i<newLabel;i++){
+			int temp=EQAry[i];
+
+			if(i%25==0){
+				file<<EQAry[i];
+				file<<endl;
+			}
+			else{
+				file<<EQAry[i];
+				while(temp<counter){
+					file<<" ";
+					temp=temp*10;	
+				}
+				file<<" ";
+			}
+		}
+		file<<endl<<endl ;
 	}
 	
 	//pretty print image and EQAry for each pass
@@ -262,7 +251,8 @@ class connectedComponents{
 	
 	//print image on argv[3]
 	void printImage(int** zeroFramedAry, ofstream& file){
-		file<<numRows<<" "<<numCols<<" "<<minVal<<" "<<maxVal<<endl;
+		//cout<<newMin<<" "<<newMax;
+		file<<numRows<<" "<<numCols<<" "<<newMin<<" "<<newMax<<endl;
 		for(int i=0;i<numRows+2;i++){
 			for(int j=0;j<numCols+2;j++){
 				if(zeroFramedAry[i][j]<10)
@@ -329,7 +319,8 @@ class connectedComponents{
 			CC[i].minCol = minCol;
 			CC[i].maxRow = maxRow;
 			CC[i].maxCol = maxCol;
-		}
+		}		cout<<newMin<<" "<<newMax;
+
 	}
 	
 	//printing Struct into argv[4]
