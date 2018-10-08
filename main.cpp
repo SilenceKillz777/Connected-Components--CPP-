@@ -164,7 +164,8 @@ class connectedComponents{
 	}
 	
 	int ConnectCC_Pass3(int** zeroFramedAry){
-		int numObjects = 0, newMin = 0, newMax = 0;
+		int numObjects = 0;
+		
 		for(int i=1;i<numRows+1;i++){
 			for(int j=1;j<numCols+1;j++){
 				zeroFramedAry[i][j] = EQAry[zeroFramedAry[i][j]];
@@ -172,13 +173,8 @@ class connectedComponents{
 					numObjects = zeroFramedAry[i][j];
 				if(zeroFramedAry[i][j]>newMax)
 					newMax = zeroFramedAry[i][j];
-			}
-		}
-
-		for(int i=1;i<numRows+1;i++){
-			for(int j=1;j<numCols+1;j++){
-				if(zeroFramedAry[i][j]){
-				}
+				if(zeroFramedAry[i][j]<newMin)
+					newMin = zeroFramedAry[i][j];
 			}
 		}
 		return numObjects;
@@ -235,6 +231,7 @@ class connectedComponents{
 	//pretty print image and EQAry for each pass
 	void prettyPrint(int** zeroFramedAry, ofstream& file, int pass){
 		file<<"This is the result of pass #"<<pass<<":"<<endl;
+		
 		for(int i=0;i<numRows+2;i++){
 			for(int j=0;j<numCols+2;j++){
 				if(zeroFramedAry[i][j]<10 && zeroFramedAry[i][j]!=0)
@@ -251,10 +248,9 @@ class connectedComponents{
 	
 	//print image on argv[3]
 	void printImage(int** zeroFramedAry, ofstream& file){
-		//cout<<newMin<<" "<<newMax;
 		file<<numRows<<" "<<numCols<<" "<<newMin<<" "<<newMax<<endl;
-		for(int i=0;i<numRows+2;i++){
-			for(int j=0;j<numCols+2;j++){
+		for(int i=1;i<numRows+1;i++){
+			for(int j=1;j<numCols+1;j++){
 				if(zeroFramedAry[i][j]<10)
 					file<<zeroFramedAry[i][j]<<"  ";
 				else file<<zeroFramedAry[i][j]<<" ";
@@ -315,11 +311,11 @@ class connectedComponents{
 			numPixels = countLabel(i+1,zeroFramedAry);
 			CC[i].numPixels = numPixels;
 			findBoundingBox(minRow, minCol, maxRow, maxCol, i+1, zeroFramedAry);
-			CC[i].minRow = minRow;
-			CC[i].minCol = minCol;
-			CC[i].maxRow = maxRow;
-			CC[i].maxCol = maxCol;
-		}		cout<<newMin<<" "<<newMax;
+			CC[i].minRow = minRow-1;
+			CC[i].minCol = minCol-1;
+			CC[i].maxRow = maxRow-1;
+			CC[i].maxCol = maxCol-1;
+		}
 
 	}
 	
